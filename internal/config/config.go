@@ -63,7 +63,7 @@ func Read() (Config, error) {
 	// make sure we close the file when we are done
 	defer file.Close()
 
-	var config Config
+	config := Config{}
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {
 		return Config{}, err
