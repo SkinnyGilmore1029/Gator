@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -11,39 +10,6 @@ import (
 
 type state struct {
 	cfg *config.Config
-}
-
-type command struct {
-	name string
-	Args []string
-}
-
-type commands struct {
-	handlers map[string]func(*state, command) error
-}
-
-func (c *commands) run(s *state, cmd command) error {
-	if handler, ok := c.handlers[cmd.name]; ok {
-		return handler(s, cmd)
-	}
-	return fmt.Errorf("unknown command: %s", cmd.name)
-}
-
-func (c *commands) register(name string, f func(*state, command) error) {
-	c.handlers[name] = f
-}
-
-func handlerLogin(s *state, cmd command) error {
-	if len(cmd.Args) == 0 {
-		return errors.New("login requires username")
-	}
-
-	err := s.cfg.SetUser(cmd.Args[0])
-	if err != nil {
-		return err
-	}
-	fmt.Println("User has been set!")
-	return nil
 }
 
 func main() {
