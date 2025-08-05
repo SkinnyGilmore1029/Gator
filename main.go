@@ -9,7 +9,7 @@ import (
 )
 
 type state struct {
-	cfg *Config
+	cfg *config.Config
 }
 
 type command struct {
