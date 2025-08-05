@@ -14,10 +14,16 @@ func main() {
 		log.Fatal("Error reading config file", err)
 	}
 
-	err = cfg.SetUser("Josh")
-	if err != nil {
-		log.Fatal("Error setting user", err)
+	s := state{
+		cfg: &cfg,
 	}
+
+	c := commands{
+		handlers: map[string]func(*state, command) error{
+			"login": handlerLogin,
+		},
+	}
+
 	cfg, err = config.Read()
 	if err != nil {
 		log.Fatal("Error reading config file", err)

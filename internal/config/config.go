@@ -2,6 +2,8 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -72,22 +74,38 @@ func Read() (Config, error) {
 	return config, nil
 }
 
-/*
+type state struct {
+	cfg *Config
+}
 
-This package should have the following functionality exported so the main package can use it:
+type command struct {
+	name string
+	Args []string
+}
 
-Export a Config struct that represents the JSON file structure, including struct tags.
-Export a Read function that reads the JSON file found at ~/.gatorconfig.json and returns a Config struct. It should read the file from the HOME directory, then decode the JSON string into a new Config struct. I used os.UserHomeDir to get the location of HOME.
-Export a SetUser method on the Config struct that writes the config struct to the JSON file after setting the current_user_name field.
-I also wrote a few non-exported helper functions and added a constant to hold the filename.
+type commands struct {
+	handlers map[string]func(*state, command) error
+}
 
-getConfigFilePath() (string, error)
-write(cfg Config) error
-const configFileName = ".gatorconfig.json"
-But you can implement the internals of the package however you like.
+func (c *commands) run(s *state, cmd command) error {
+	if handler, ok := c.handlers[cmd.Args[0]]; ok {
+		return handler(s, cmd)
+	}
+	return fmt.Errorf("unknown command: %s", cmd.Args[0])
+}
 
-Update the main function to:
-Read the config file.
-Set the current user to "lane" (actually, you should use your name instead) and update the config file on disk.
-Read the config file again and print the contents of the config struct to the terminal.
-*/
+func (c *commands) register(name string, f func(*state, command) error) {
+	c.handlers[name] = f
+}
+
+func handlerLogin(s *state, cmd command) error {
+	if len(cmd.Args) == 0 {
+		return errors.New("login requires username")
+	}
+	err := s.cfg.SetUser(cmd.name)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("User has been set!")
+	return nil
+}
