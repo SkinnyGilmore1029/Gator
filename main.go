@@ -1,14 +1,18 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/SkinnyGilmore1029/gator/internal/config"
+	"github.com/SkinnyGilmore1029/gator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 type state struct {
+	db  *database.Queries
 	cfg *config.Config
 }
 
@@ -19,7 +23,16 @@ func main() {
 		log.Fatal("Error reading config file", err)
 	}
 
-	s := state{
+	//Now I can use the loaded config file
+	db, err := sql.Open("postgres", cfg.DBURL)
+	if err != nil {
+		log.Fatal("Error opening database connection", err)
+	}
+
+	dbQueries := database.New(db)
+
+	s := &state{
+		db:  dbQueries,
 		cfg: &cfg,
 	}
 
@@ -28,6 +41,7 @@ func main() {
 	}
 
 	c.register("login", handlerLogin)
+	c.register("register", handlerRegister)
 
 	if len(os.Args) < 2 {
 		fmt.Println("not enough arguments")
@@ -42,7 +56,7 @@ func main() {
 		Args: arguments,
 	}
 
-	if err := c.run(&s, cmd); err != nil {
+	if err := c.run(s, cmd); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
