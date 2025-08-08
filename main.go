@@ -43,6 +43,7 @@ func main() {
 	c.register("login", handlerLogin)
 	c.register("register", handlerRegister)
 	c.register("reset", handlerReset)
+	c.register("users", handlerListUsers)
 
 	if len(os.Args) < 2 {
 		fmt.Println("not enough arguments")
@@ -63,33 +64,3 @@ func main() {
 	}
 
 }
-
-/*
-
-
-cfg, err = config.Read()
-	if err != nil {
-		log.Fatal("Error reading config file", err)
-	}
-	fmt.Printf("Config: %+v\n", cfg)
-
-import (
-    "fmt"
-    "os"
-)
-
-func main() {
-    fmt.Println(os.Args)
-
-    if len(os.Args) < 2 {
-        fmt.Println("not enough arguments")
-        return
-    }
-
-    commandName := os.Args[1] // "greet"
-    arguments := os.Args[2:]  // ["boots"]
-
-    fmt.Printf("Command: %s\n", commandName)
-    fmt.Printf("Arguments: %v\n", arguments)
-}
-*/
