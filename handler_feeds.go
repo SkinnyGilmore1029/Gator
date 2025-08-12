@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/SkinnyGilmore1029/gator/internal/database"
+	"github.com/google/uuid"
 )
 
 func handlerFeeds(s *state, cmd command) error {
@@ -22,14 +25,29 @@ func handlerFeeds(s *state, cmd command) error {
 	return nil
 }
 
-/*
+func handlerAddfeed(s *state, cmd command) error {
+	// check the lenght to make sure its valid
+	if len(cmd.Args) < 2 {
+		return fmt.Errorf("addfeed requires a name and a url")
+	}
 
-Assignment
-Add a new feeds handler. It takes no arguments and prints all the feeds in the database to the console. Be sure to include:
+	// Get the current user
+	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		return fmt.Errorf("failed to get user: %w", err)
+	}
 
-The name of the feed
-The URL of the feed
-The name of the user that created the feed (you might need a new SQL query)
+	// get and save info into variables to use
+	params := database.CreateFeedParams{
+		Name:   cmd.Args[0],
+		Url:    cmd.Args[1],
+		UserID: uuid.NullUUID{UUID: user.ID, Valid: true},
+	}
 
-
-*/
+	newFeed, err := s.db.CreateFeed(context.Background(), params)
+	if err != nil {
+		return fmt.Errorf("failed to create feed: %w", err)
+	}
+	fmt.Println(newFeed)
+	return nil
+}
