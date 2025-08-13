@@ -26,16 +26,10 @@ func handlerFeeds(s *state, cmd command) error {
 	return nil
 }
 
-func handlerAddfeed(s *state, cmd command) error {
+func handlerAddfeed(s *state, cmd command, user database.User) error {
 	// check the lenght to make sure its valid
 	if len(cmd.Args) < 2 {
 		return fmt.Errorf("addfeed requires a name and a url")
-	}
-
-	// Get the current user
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		return fmt.Errorf("failed to get user: %w", err)
 	}
 
 	// get and save info into variables to use
