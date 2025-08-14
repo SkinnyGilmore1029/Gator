@@ -70,7 +70,7 @@ func handlerUnfollow(s *state, cmd command, user database.User) error {
 
 	err = s.db.DeleteFeedFollow(context.Background(), database.DeleteFeedFollowParams{
 		UserID: uuid.NullUUID{UUID: user.ID, Valid: true},
-		FeedID: uuid.NullUUID{UUID: feed.ID, Valid: true},
+		FeedID: uuid.NullUUID{UUID: feed, Valid: true},
 	})
 	if err != nil {
 		return fmt.Errorf("couldnt delete feed follow: %w", err)
